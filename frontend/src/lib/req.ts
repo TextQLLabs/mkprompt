@@ -11,7 +11,7 @@ export type AppState = {
     diagnostics: Diagnostic[];
     symbols: vscode.SymbolInformation[];
     openFiles: vscode.Uri[];
-    currentFile: vscode.Uri;
+    currentFile: null | vscode.Uri;
 };
 
 export type Loc = {

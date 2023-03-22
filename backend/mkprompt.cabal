@@ -97,6 +97,8 @@ executable helios
         data-default,
         wai,
         unliftio,
+        wai-websockets,
+        websockets,
 
     -- Directories containing source files.
     hs-source-dirs:   app

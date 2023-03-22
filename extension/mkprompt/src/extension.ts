@@ -9,7 +9,7 @@ type AppState = {
     diagnostics: vscode.Diagnostic[];
     symbols: vscode.SymbolInformation[];
     openFiles: vscode.Uri[];
-    currentFile: vscode.Uri;
+    currentFile: null | vscode.Uri;
 };
 
 type RequestLoc = {
@@ -24,14 +24,14 @@ type SnippetWebSocketRequest = {
 };
 
 async function pingEndpoint(): Promise<boolean> {
-  const endpoint = 'http://localhost:4080/ping';
-  try {
-    const response = await axios.get(endpoint);
-    return response.data === 'pong';
-  } catch (error: any) {
-    console.error('Error pinging endpoint:', error.message);
-    return false;
-  }
+    const endpoint = 'http://localhost:4080/ping';
+    try {
+        const response = await axios.get(endpoint);
+        return response.data === 'pong';
+    } catch (error: any) {
+        console.error('Error pinging endpoint:', error.message);
+        return false;
+    }
 }
 
 async function sendAppState(appState: AppState) {
@@ -125,6 +125,26 @@ export function activate(context: vscode.ExtensionContext) {
             await fulfillSnippetRequest(messageData);
         });
         connected = true;
+
+        // Create a mock event from the active text document
+        const activeDocument = vscode.window.activeTextEditor?.document;
+        if (!activeDocument) {
+            vscode.window.showErrorMessage('Open a document before you connect to the app.');
+            return;
+        }
+
+        const mockEvent: vscode.TextDocumentChangeEvent = {
+            document: activeDocument,
+            contentChanges: [],
+            reason: vscode.TextDocumentChangeReason.Undo
+        };
+
+        // Create the initial app state
+        const initialAppState = await createAppStateFromEvent(mockEvent);
+
+        // Send the initial app state
+        await sendAppState(initialAppState);
+
         vscode.window.showInformationMessage('Connected to mkprompt app!');
     });
 

@@ -121,8 +121,8 @@
             {/each}
         </div>
     </div>
-    {#if appState}
         <div class="flex flex-col justify-start h-screen space-y-4 w-1/4 divide-y-2">
+    {#if appState && appState.currentFile}
             <div class="flex flex-col space-y-2">
                 <h3 class="text-lg font-semibold mb-2">Diagnostics</h3>
                 <div class="overflow-y-auto max-h-[20rem] space-y-2">
@@ -168,6 +168,8 @@
                     {/each}
                 </div>
             </div>
-        </div>
+    {:else}
+        <h2 class="text-lg font-semibold mb-2">Not Connected. Run "Connect to MkPrompt Web App from VSCode."</h2>
     {/if}
+        </div>
 </div>

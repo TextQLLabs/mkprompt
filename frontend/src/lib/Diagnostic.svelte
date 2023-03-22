@@ -27,11 +27,15 @@
 
     async function addError() {
         let range = diagnostic.range;
-        const location = currentUri.path + ':' + rangeToString(diagnostic.range) + ":";
+        const location = currentUri.path + ':' + rangeToString(diagnostic.range) + ':';
         range[0].character = 0;
         range[1].character = Number.MAX_SAFE_INTEGER;
         const snippet = await getSnippet(currentUri, diagnostic.range);
-        dispatch('addDiagnostic', { message: diagnostic.message, snippet: snippet, location: location });
+        dispatch('addDiagnostic', {
+            message: diagnostic.message,
+            snippet: snippet,
+            location: location
+        });
     }
 </script>
 

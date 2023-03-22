@@ -1,7 +1,13 @@
 {
   "name": "mkprompt",
   "displayName": "mkprompt",
-  "description": "",
+  "description": "Inject code, errors, and definitions into your ChatGPT prompt (VSCode extension)",
+  "logo": "logo.png",
+  "publisher": "TextQL",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TextQLLabs/mkprompt"
+  },
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.75.0"
@@ -20,9 +26,9 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "compile": "npm run esbuild-base",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "fix": "eslint src --ext ts --fix",
@@ -38,6 +44,7 @@
     "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.53.0",
     "@vscode/test-electron": "^2.2.3",
+    "esbuild": "^0.17.12",
     "eslint": "^8.34.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",

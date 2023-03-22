@@ -14,8 +14,9 @@
     $: range = symbol.location.range as unknown as Locs;
 
     async function onAddSnippet() {
+        const location = symbol.location.uri.path + ':' + rangeToString(range) + ":";
         const snippet = await getSnippet(symbol.location.uri, range);
-        dispatch('addSymbol', snippet);
+        dispatch('addSymbol', { snippet: snippet, location: location });
     }
 </script>
 

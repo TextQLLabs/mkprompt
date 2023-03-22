@@ -129,7 +129,7 @@ export function activate(context: vscode.ExtensionContext) {
         // Create a mock event from the active text document
         const activeDocument = vscode.window.activeTextEditor?.document;
         if (!activeDocument) {
-            vscode.window.showErrorMessage('Open a document before you connect to the app.');
+            vscode.window.showErrorMessage('Open a code file before you connect to the app.');
             return;
         }
 

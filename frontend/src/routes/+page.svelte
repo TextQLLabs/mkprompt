@@ -13,12 +13,7 @@
         isCode: boolean;
     };
 
-    let promptBlocks: PromptBlock[] = [
-        {
-            content: '// Welcome to MkPrompt!',
-            isCode: true
-        }
-    ];
+    let promptBlocks: PromptBlock[] = [];
     let newBlockContent = '';
 
     function mkPrompt(): string {
@@ -84,13 +79,15 @@
         appState = await getAppState();
     }
 
-    function addDiagnostic(event: { detail: { message: string; snippet: string } }) {
+    function addDiagnostic(event: { detail: { message: string; snippet: string, location: location } }) {
         addBlock(event.detail.message, true);
+        addBlock(event.detail.location, false);
         addBlock(event.detail.snippet, true);
     }
 
-    function addSymbol(event: { detail: string }) {
-        addBlock(event.detail, true);
+    function addSymbol(event: { detail: {snippet: string, location: string} }) {
+        addBlock(event.detail.location, false);
+        addBlock(event.detail.snippet, true);
     }
 
     function addFile(event: { detail: string }) {
@@ -108,12 +105,13 @@
 <div class="p-8 flex flex-row">
     <div class="w-3/4 mr-8">
         <div class="mb-4">
-            <textarea
+          <form on:submit|preventDefault={submitBlock}>
+            <input
                 class="border border-gray-200 rounded p-2 w-full"
-                rows="4"
                 placeholder="Type a new block or select an existing one to edit"
                 bind:value={newBlockContent}
             />
+          </form>
             <button class="bg-blue-500 text-white px-4 py-2 mt-2" on:click={submitBlock}
                 >Add Block</button
             >
@@ -134,6 +132,10 @@
                 />
             {/each}
         </div>
+          <div class="invisible">
+            <PromptBlock
+                content="console.log(you.shouldnt.see.this)"
+                renderAsCode={true} /></div>
     </div>
     <div class="flex flex-col justify-start h-screen space-y-4 w-1/4 divide-y-2">
         {#if appState && appState.currentFile}

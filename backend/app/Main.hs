@@ -149,7 +149,6 @@ mkApp args state = do
             corsRequestHeaders = ["authorization", "content-type"]
           }
 
-
   Scotty.post "/appState" $ do
     syms <- Scotty.jsonData :: Scotty.ActionM EditorState
     liftIO $ pushEditorState state syms

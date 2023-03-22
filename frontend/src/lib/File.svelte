@@ -16,7 +16,7 @@
 </script>
 
 <div class={classes}>
-    <div class="font-semibold text-sm">{uri.fsPath}</div>
+    <div class="font-semibold text-sm">{uri.path}</div>
     <button on:click={getContents} class="bg-slate-100 text-black rounded p-1 text-xs"
         >+Contents</button
     >

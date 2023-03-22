@@ -1,19 +1,34 @@
 {
-  description = "TextQL demo";
+  description = "MkPrompt";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
+    nix-npm-buildpackage.url = "github:serokell/nix-npm-buildpackage";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, nix-npm-buildpackage, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
         haskellPackages = pkgs.haskell.packages.ghc92;
 
-        packageName = "helios";
+        packageName = "mkprompt";
+
+        frontend = nix-npm-buildpackage.legacyPackages.x86_64-linux.buildNpmPackage 
+            rec { 
+              src = ./frontend; 
+              installPhase = 
+                ''
+                    runHook preInstall
+                    mkdir $out
+                    cp -r ./build/* $out
+                    runHook postInstall
+                '';
+              npmBuild = "npm run build"; 
+          };
+
         pkg = isDev: haskellPackages.developPackage { 
             root = ./backend; 
             returnShellEnv = isDev;
@@ -26,30 +41,24 @@
                     ])
                 else drv;
             };
-        staticFiles = pkgs.runCommand "staticFiles"
-            {
-                preferLocalBuild = true;
-                buildInputs = [];
-            }
-            ''
-                mkdir $out
-                cp -r ${./static}/* $out
-            '';
 
         mkDocker = args: pkgs.dockerTools.buildImage {
-            name = "api";
-            copyToRoot = [pkgs.cacert];
+            name = "mkprompt";
             config = {
                 Cmd = args;
                 ExposedPorts = {
-                    "3009/tcp" = {};
+                    "4080/tcp" = {};
                 };
             };
         };
 
       in {
         packages.${packageName} = pkg false;
-        packages.dockerImage = mkDocker [];
+        packages.dockerImage = mkDocker [
+          "${pkg false}/bin/mkprompt"
+          "--static-file-dir" "${frontend}"
+        ];
+        packages.frontend = frontend;
         devShell = pkg true;
       });
 }

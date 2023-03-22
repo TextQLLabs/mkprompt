@@ -30,7 +30,7 @@
         range[0].character = 0;
         range[1].character = Number.MAX_SAFE_INTEGER;
         const snippet = await getSnippet(currentUri, diagnostic.range);
-        dispatch('addDiagnostic', {message:diagnostic.message, snippet:snippet});
+        dispatch('addDiagnostic', { message: diagnostic.message, snippet: snippet });
     }
 </script>
 

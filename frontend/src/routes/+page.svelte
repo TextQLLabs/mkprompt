@@ -13,18 +13,23 @@
         isCode: boolean;
     };
 
-    let promptBlocks: PromptBlock[] = [];
+    let promptBlocks: PromptBlock[] = [
+        {
+            content: '// Welcome to MkPrompt!',
+            isCode: true
+        }
+    ];
     let newBlockContent = '';
 
     function mkPrompt(): string {
         let promptLines: string[] = [];
         for (let block of promptBlocks) {
             if (block.isCode) {
-              promptLines.push('```');
-              promptLines.push(block.content);
-              promptLines.push('```');
+                promptLines.push('```');
+                promptLines.push(block.content);
+                promptLines.push('```');
             } else {
-              promptLines.push(block.content);
+                promptLines.push(block.content);
             }
         }
         return promptLines.join('\n');
@@ -37,18 +42,23 @@
     function addBlock(content: string, isCode = false) {
         let newBlock: PromptBlock = {
             content: content,
-            isCode: isCode,
+            isCode: isCode
         };
         promptBlocks = [...promptBlocks, newBlock];
     }
 
     function submitBlock() {
         addBlock(newBlockContent, false);
+        newBlockContent = '';
     }
 
     function deleteBlock(event: { detail: number }) {
         promptBlocks.splice(event.detail, 1);
         promptBlocks = [...promptBlocks]; // Force Svelte to re-render the list
+    }
+
+    function clearBlocks() {
+        promptBlocks = [];
     }
 
     let appState: AppState;
@@ -67,14 +77,14 @@
         );
 
     function isCurrent(file: vscode.Uri, appState: AppState) {
-        return file.fsPath === appState.currentFile.fsPath;
+        return file.fsPath === appState.currentFile?.fsPath;
     }
 
     async function refreshAppState() {
         appState = await getAppState();
     }
 
-    function addDiagnostic(event: { detail: { message: string; snippet: string;} }) {
+    function addDiagnostic(event: { detail: { message: string; snippet: string } }) {
         addBlock(event.detail.message, true);
         addBlock(event.detail.snippet, true);
     }
@@ -108,7 +118,11 @@
                 >Add Block</button
             >
             <button class="bg-blue-500 text-white px-4 py-2 mt-2 ml-2" on:click={copyPrompt}
-                >Copy Prompt</button>
+                >Copy Prompt</button
+            >
+            <button class="bg-red-500 text-white px-4 py-2 mt-2 ml-2" on:click={clearBlocks}
+                >Clear</button
+            >
         </div>
         <div class="space-y-4">
             {#each promptBlocks as block, index (block)}
@@ -121,8 +135,8 @@
             {/each}
         </div>
     </div>
-        <div class="flex flex-col justify-start h-screen space-y-4 w-1/4 divide-y-2">
-    {#if appState && appState.currentFile}
+    <div class="flex flex-col justify-start h-screen space-y-4 w-1/4 divide-y-2">
+        {#if appState && appState.currentFile}
             <div class="flex flex-col space-y-2">
                 <h3 class="text-lg font-semibold mb-2">Diagnostics</h3>
                 <div class="overflow-y-auto max-h-[20rem] space-y-2">
@@ -168,8 +182,10 @@
                     {/each}
                 </div>
             </div>
-    {:else}
-        <h2 class="text-lg font-semibold mb-2">Not Connected. Run "Connect to MkPrompt Web App from VSCode."</h2>
-    {/if}
-        </div>
+        {:else}
+            <h2 class="text-lg font-semibold mb-2">
+                Not Connected. Run "Connect to MkPrompt Web App from VSCode." to connect.
+            </h2>
+        {/if}
+    </div>
 </div>

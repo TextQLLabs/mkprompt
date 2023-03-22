@@ -1,6 +1,8 @@
 // Import vscode types
 import type * as vscode from 'vscode';
 
+const endpoint = import.meta.env.VITE_API ? import.meta.env.VITE_API : '';
+
 export type Diagnostic = {
     severity: 'Error' | 'Warning' | 'Information' | 'Hint'; // Vscode serializes to the string equivalents
     message: string;
@@ -21,12 +23,12 @@ export type Loc = {
 
 export async function getAppState(): Promise<AppState> {
     // fetch the app state
-    let resp = await fetch('http://127.0.0.1:4080/appState');
+    let resp = await fetch(endpoint + '/appState');
     return resp.json();
 }
 
 export async function getSnippet(uri: vscode.Uri, range: null | Loc[] = null): Promise<string> {
-    let resp = await fetch('http://127.0.0.1:4080/snippet', {
+    let resp = await fetch(endpoint + '/snippet', {
         method: 'POST',
         body: JSON.stringify({
             uri: uri,
